@@ -400,7 +400,7 @@ func getSpec() (*llrp.ROSpec, error) {
 		return nil, err
 	}
 
-	spec.ROSpecID = uint32(roSpecID)
+	spec.ROSpecID = uint32(roSpecID) // #nosec G115
 
 	if spec.ROReportSpec == nil {
 		spec.ROReportSpec = &llrp.ROReportSpec{
@@ -635,13 +635,13 @@ func (ri *readInfo) handleROAR(_ *llrp.Client, msg llrp.Message) {
 
 		if tagReport.FirstSeenUTC != nil {
 			fmt.Fprintf(&rpt, " | first %s",
-				time.Unix(0, int64(*tagReport.FirstSeenUTC*1000)).Format(time.StampMicro))
+				time.Unix(0, int64(*tagReport.FirstSeenUTC*1000)).Format(time.StampMicro)) // #nosec G115
 		}
 
 		if tagReport.LastSeenUTC != nil {
 			fmt.Fprintf(&rpt, " | last %s",
-				time.Unix(0, int64(*tagReport.LastSeenUTC*1000)).Format(time.StampMicro))
-			td.times.addInterval(int64(*tagReport.LastSeenUTC) / 1000)
+				time.Unix(0, int64(*tagReport.LastSeenUTC*1000)).Format(time.StampMicro)) // #nosec G115
+			td.times.addInterval(int64(*tagReport.LastSeenUTC) / 1000) // #nosec G115
 		}
 
 		if tagReport.TagSeenCount != nil {

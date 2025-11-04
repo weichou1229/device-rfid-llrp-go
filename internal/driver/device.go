@@ -217,7 +217,7 @@ func (d *Driver) NewLLRPDevice(name string, address net.Addr, opState contract.O
 // upon SetReaderConfig messages.
 func (l *LLRPDevice) TrySend(ctx context.Context, request llrp.Outgoing, reply llrp.Incoming) error {
 	if req, ok := request.(*llrp.SetReaderConfig); ok {
-		ka := llrp.Millisecs32(keepAliveInterval.Milliseconds())
+		ka := llrp.Millisecs32(keepAliveInterval.Milliseconds()) // #nosec G115
 		if req.KeepAliveSpec != nil {
 			reqKA := req.KeepAliveSpec
 			if reqKA.Interval != ka || reqKA.Trigger != llrp.KATriggerPeriodic {
@@ -362,7 +362,7 @@ func (l *LLRPDevice) newReaderEventHandler(svc interfaces.DeviceServiceSDK) llrp
 
 		renData := event.ReaderEventNotificationData
 		if renData.UTCTimestamp == 0 && readerStart.IsZero() {
-			readerStart = now.Add(-1 * time.Microsecond * time.Duration(renData.Uptime))
+			readerStart = now.Add(-1 * time.Microsecond * time.Duration(renData.Uptime)) // #nosec G115
 		}
 
 		if !readerStart.IsZero() {
@@ -424,6 +424,7 @@ func (l *LLRPDevice) newROHandler() llrp.MessageHandler {
 func uptimeToUTC(readerStart time.Time, uptime llrp.Uptime) llrp.UTCTimestamp {
 	// UTC of event = readerStartUTC + duration between reader start and event.
 	// We have to divide by 1000 to get from nanosecs back to microsecs.
+	// #nosec G115
 	return llrp.UTCTimestamp(readerStart.
 		Add(time.Microsecond*time.Duration(uptime)).
 		UnixNano() / 1000)
@@ -480,7 +481,7 @@ func (l *LLRPDevice) onConnect(svc interfaces.DeviceServiceSDK) {
 	conf := &llrp.SetReaderConfig{
 		KeepAliveSpec: &llrp.KeepAliveSpec{
 			Trigger:  llrp.KATriggerPeriodic,
-			Interval: llrp.Millisecs32(keepAliveInterval.Milliseconds()),
+			Interval: llrp.Millisecs32(keepAliveInterval.Milliseconds()), // #nosec G115
 		},
 	}
 

@@ -165,7 +165,7 @@ func (pt ParamType) IsTLV() bool {
 // IsValid returns true if the ParamType is within the valid LLRP Parameter range
 // and not one of the reserved parameter types (900-999)
 func (pt ParamType) IsValid() bool {
-	return 0 < pt && pt <= 2047 && !(paramResvStart <= pt && pt <= paramResvEnd)
+	return 0 < pt && pt <= 2047 && (paramResvStart > pt || pt > paramResvEnd)
 }
 
 const (

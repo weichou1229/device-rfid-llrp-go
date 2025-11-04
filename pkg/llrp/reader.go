@@ -712,7 +712,7 @@ func (c *Client) handleIncoming() error {
 				return fmt.Errorf("failed to get next message: %v", err)
 			}
 
-			if !(errors.Is(err, io.EOF) || os.IsTimeout(err) || errors.Is(err, io.ErrClosedPipe)) {
+			if !errors.Is(err, io.EOF) && !os.IsTimeout(err) && !errors.Is(err, io.ErrClosedPipe) {
 				return fmt.Errorf("unexpected error after reader closed: %v", err)
 			}
 

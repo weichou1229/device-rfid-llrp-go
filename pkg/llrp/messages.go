@@ -73,7 +73,7 @@ var mirrorType = map[MessageType]MessageType{
 
 // IsValid returns true if the messageType is within the permitted messageType space.
 func (mt MessageType) IsValid() bool {
-	return minMsgType <= mt && mt <= maxMsgType && !(msgResvStart <= mt && mt <= msgResvEnd)
+	return minMsgType <= mt && mt <= maxMsgType && (msgResvStart > mt || mt > msgResvEnd)
 }
 
 // Converse returns the MessageType associated with this one,
@@ -318,7 +318,7 @@ func NewByteMessage(typ MessageType, payload []byte) (m Message, err error) {
 	if int64(len(payload)) > int64(maxPayloadSz) {
 		return Message{}, errors.New("LLRP messages are limited to 4GiB (minus a 10 byte header)")
 	}
-	n := uint32(len(payload))
+	n := uint32(len(payload)) // #nosec G115
 	return newMessage(bytes.NewReader(payload), n, typ), nil
 }
 

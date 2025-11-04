@@ -340,7 +340,7 @@ func NewConnectMessage(eventType ConnectionAttemptEventType) *ReaderEventNotific
 	c := ConnectionAttemptEvent(eventType)
 	return &ReaderEventNotification{
 		ReaderEventNotificationData: ReaderEventNotificationData{
-			UTCTimestamp:           UTCTimestamp(time.Now().UnixNano() / 1000),
+			UTCTimestamp:           UTCTimestamp(time.Now().UnixNano() / 1000), // #nosec G115
 			ConnectionAttemptEvent: &c,
 		}}
 }
@@ -348,7 +348,7 @@ func NewConnectMessage(eventType ConnectionAttemptEventType) *ReaderEventNotific
 func NewCloseMessage() *ReaderEventNotification {
 	return &ReaderEventNotification{
 		ReaderEventNotificationData: ReaderEventNotificationData{
-			UTCTimestamp:         UTCTimestamp(time.Now().UnixNano() / 1000),
+			UTCTimestamp:         UTCTimestamp(time.Now().UnixNano() / 1000), // #nosec G115
 			ConnectionCloseEvent: &ConnectionCloseEvent{},
 		}}
 }

@@ -15,8 +15,8 @@ import (
 )
 
 var (
-	urerr  = fmt.Errorf("unrecoverable error")
-	recerr = fmt.Errorf("recoverable error")
+	errUnrecoverable = fmt.Errorf("unrecoverable error")
+	errRecoverable   = fmt.Errorf("recoverable error")
 )
 
 func TestExpBackOff_Retry_noErr(t *testing.T) {
@@ -38,7 +38,7 @@ func TestExpBackOff_Retry_errs(t *testing.T) {
 	}
 
 	// Retry expects all errors are recoverable.
-	recoverable := func() error { return recerr }
+	recoverable := func() error { return errRecoverable }
 
 	// Since the function reports it might recover,
 	// it's called as many times as Retries allows;
@@ -59,28 +59,28 @@ func TestExpBackOff_RetrySome(t *testing.T) {
 		KeepErrs: 5,
 	}
 
-	recoverable := func() (bool, error) { return true, recerr }
-	unrecoverable := func() (bool, error) { return false, urerr }
+	recoverable := func() (bool, error) { return true, errRecoverable }
+	unrecoverable := func() (bool, error) { return false, errUnrecoverable }
 
 	checkRetrySome(t, ebo, recoverable, 1, ErrRetriesExceeded, 1)
 	checkRetrySome(t, ebo, recoverable, 2, ErrRetriesExceeded, 2)
 	checkRetrySome(t, ebo, recoverable, 3, ErrRetriesExceeded, 3)
 	checkRetrySome(t, ebo, recoverable, 15, ErrRetriesExceeded, 5)
-	checkRetrySome(t, ebo, unrecoverable, 1, urerr, 1)
-	checkRetrySome(t, ebo, unrecoverable, 2, urerr, 1)
-	checkRetrySome(t, ebo, unrecoverable, 3, urerr, 1)
+	checkRetrySome(t, ebo, unrecoverable, 1, errUnrecoverable, 1)
+	checkRetrySome(t, ebo, unrecoverable, 2, errUnrecoverable, 1)
+	checkRetrySome(t, ebo, unrecoverable, 3, errUnrecoverable, 1)
 
 	// Always return an error, but only return "true" the first few times.
 	c := 0
 	f := func() (bool, error) {
 		c++
 		if c > 3 {
-			return false, urerr
+			return false, errUnrecoverable
 		}
-		return true, recerr
+		return true, errRecoverable
 	}
 
-	checkRetrySome(t, ebo, f, 5, urerr, 3)
+	checkRetrySome(t, ebo, f, 5, errUnrecoverable, 3)
 }
 
 type errType struct {
@@ -225,7 +225,7 @@ func TestExpBackOff_RetryWithCtx_cancel(t *testing.T) {
 	fCalled := make(chan struct{})
 	f := func(_ context.Context) (bool, error) {
 		close(fCalled)
-		return true, recerr
+		return true, errRecoverable
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -255,7 +255,7 @@ func TestExpBackOff_RetryWithCtx_deadline(t *testing.T) {
 	fCalled := make(chan struct{})
 	f := func(_ context.Context) (bool, error) {
 		close(fCalled)
-		return true, recerr
+		return true, errRecoverable
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Millisecond)
@@ -270,7 +270,7 @@ func TestExpBackOff_RetryWithCtx_deadline(t *testing.T) {
 	<-fCalled
 
 	err := <-errs
-	if !(errors.Is(err, context.DeadlineExceeded) || errors.Is(err, ErrWaitExceedsDeadline)) {
+	if !errors.Is(err, context.DeadlineExceeded) && !errors.Is(err, ErrWaitExceedsDeadline) {
 		t.Errorf("expected %v or %v; got %v",
 			context.DeadlineExceeded, ErrWaitExceedsDeadline, err)
 	}
@@ -398,7 +398,7 @@ func untilCount(max int) (Func, *int) {
 	return func(_ context.Context) (bool, error) {
 		if c < max {
 			c++
-			return true, recerr
+			return true, errRecoverable
 		}
 
 		return false, nil
