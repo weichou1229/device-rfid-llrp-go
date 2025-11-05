@@ -175,7 +175,7 @@ func connectSuccess(h *Header, rfid net.Conn) error {
 
 func closeSuccess(h *Header, rfid net.Conn) error {
 	d, _ := hex.DecodeString("04040000000000000000011f000800000000")
-	binary.BigEndian.PutUint32(d[2:], uint32(len(d)))
+	binary.BigEndian.PutUint32(d[2:], uint32(len(d))) // #nosec G115
 	binary.BigEndian.PutUint32(d[6:], uint32(h.id))
 	_, err := rfid.Write(d)
 	return err
@@ -209,7 +209,7 @@ func randomReply(minSz, maxSz uint32) func(h *Header, rfid net.Conn) error {
 		// Use int64 to get full uint32; CopyN needs an int64 anyway.
 		sz := rnd.Int63n(dist) + min64
 		reply := Header{
-			payloadLen: uint32(sz),
+			payloadLen: uint32(sz), // #nosec G115
 			id:         h.id,
 			typ:        mirrorType[h.typ],
 			version:    h.version,
@@ -422,8 +422,8 @@ func TestClient_ManySenders(t *testing.T) {
 	}
 
 	for err := range connErrs {
-		if !(errors.Is(err, ErrClientClosed) ||
-			errors.Is(err, io.ErrClosedPipe)) {
+		if !errors.Is(err, ErrClientClosed) &&
+			!errors.Is(err, io.ErrClosedPipe) {
 			t.Errorf("connect error: %+v", err)
 		}
 	}

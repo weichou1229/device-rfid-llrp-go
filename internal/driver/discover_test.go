@@ -394,7 +394,7 @@ func TestIpGeneratorSubnetSizes(t *testing.T) {
 		i := i
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			t.Parallel()
-			result := ipGeneratorTest(inetTest{size: uint32(i), inet: fmt.Sprintf("192.168.1.1/%d", i)})
+			result := ipGeneratorTest(inetTest{size: uint32(i), inet: fmt.Sprintf("192.168.1.1/%d", i)}) // #nosec G115
 			if result.size != computeNetSz(i) {
 				t.Errorf("expected %d ips, but got %d", computeNetSz(i), result.size)
 			}

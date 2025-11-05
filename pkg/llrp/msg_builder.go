@@ -24,7 +24,7 @@ type paramHeader struct {
 
 func encodeParams(w io.Writer, headers ...paramHeader) error {
 	for _, h := range headers {
-		if h.ParamType.IsTV() {
+		if h.IsTV() {
 			if n, err := w.Write([]byte{byte(h.ParamType | 0x80)}); err != nil {
 				return fmt.Errorf("failed to write TV header for %v: %w", h.ParamType, err)
 			} else if n < 1 {
@@ -79,12 +79,13 @@ func (mw *msgWriter) Write(mid messageID, out Outgoing) error {
 		return err
 	}
 
+	// #nosec G115
 	if uint32(len(data)) > maxPayloadSz {
 		return fmt.Errorf("outgoing payload size (%d) "+
 			"is larger than that permitted by LLRP", len(data))
 	}
 
-	mw.header.payloadLen = uint32(len(data))
+	mw.header.payloadLen = uint32(len(data)) // #nosec G115
 	mw.header.typ = out.Type()
 	mw.header.id = mid
 	if _, err := mw.header.WriteTo(mw.w); err != nil {

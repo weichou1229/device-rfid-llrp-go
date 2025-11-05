@@ -28,7 +28,7 @@ func TestMsgReader_readerEventNotification(t *testing.T) {
 		0x0, 246, // ReaderEventNotificationParameter
 		0x0, 0x0, // length (set below)
 	}, eventData...)
-	binary.BigEndian.PutUint16(pReaderEvent[2:4], uint16(len(pReaderEvent)))
+	binary.BigEndian.PutUint16(pReaderEvent[2:4], uint16(len(pReaderEvent))) // #nosec G115
 
 	ren := ReaderEventNotification{}
 	if err := ren.UnmarshalBinary(pReaderEvent); err != nil {
